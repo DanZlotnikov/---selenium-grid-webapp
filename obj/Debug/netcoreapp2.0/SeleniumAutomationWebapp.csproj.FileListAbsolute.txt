@@ -1,0 +1,11 @@
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\bin\Debug\netcoreapp2.0\SeleniumAutomationWebapp.deps.json
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\bin\Debug\netcoreapp2.0\SeleniumAutomationWebapp.runtimeconfig.json
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\bin\Debug\netcoreapp2.0\SeleniumAutomationWebapp.runtimeconfig.dev.json
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\bin\Debug\netcoreapp2.0\SeleniumAutomationWebapp.dll
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\obj\Debug\netcoreapp2.0\SeleniumAutomationWebapp.csprojAssemblyReference.cache
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\obj\Debug\netcoreapp2.0\SeleniumAutomationWebapp.csproj.CoreCompileInputs.cache
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\obj\Debug\netcoreapp2.0\SeleniumAutomationWebapp.AssemblyInfoInputs.cache
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\obj\Debug\netcoreapp2.0\SeleniumAutomationWebapp.AssemblyInfo.cs
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\bin\Debug\netcoreapp2.0\SeleniumAutomationWebapp.pdb
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\obj\Debug\netcoreapp2.0\SeleniumAutomationWebapp.dll
+C:\Users\Dan.Z\source\repos\SeleniumAutomationWebapp\SeleniumAutomationWebapp\obj\Debug\netcoreapp2.0\SeleniumAutomationWebapp.pdb
