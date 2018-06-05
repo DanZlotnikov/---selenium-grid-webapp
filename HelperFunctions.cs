@@ -5,11 +5,14 @@ using System;
 using System.IO;
 using System.Threading;
 using static SeleniumAutomationWebapp.Consts;
+using static SeleniumAutomationWebapp.GlobalSettings;
+using System.Diagnostics;
 
 namespace SeleniumAutomationWebapp
 {
     class HelperFunctions
-    {
+    { 
+
         /// <summary>
         /// Delegate a function into an object
         /// </summary>
@@ -88,8 +91,8 @@ namespace SeleniumAutomationWebapp
         {
             IWebElement element;
 
-            int retryCount = 0;
-            while (retryCount < Consts.maxRetryCount)
+            int retryCount = 1;
+            while (retryCount < maxRetryCount)
             {
                 try
                 {
@@ -97,7 +100,7 @@ namespace SeleniumAutomationWebapp
                     Highlight(webappDriver, element);
                     element.Click();
 
-                    return;
+                    break;
                 }
                 catch (Exception e)
                 {
@@ -107,9 +110,25 @@ namespace SeleniumAutomationWebapp
                 }
             }
 
-            string errorMessage = string.Format("Click action failed for element at XPath: {0}", elementXPath);
-            RetryException error = new RetryException(errorMessage);
-            throw error;
+            // If succeeded, write to performance log
+            if (retryCount < maxRetryCount)
+            {
+                // Get caller test function name
+                StackTrace stackTrace = new StackTrace();
+                string testName = stackTrace.GetFrame(1).GetMethod().Name;
+
+                WriteToPerformanceLog(testName, "SafeClick", retryCount);
+                return;
+            }
+
+            // Otherwise throw execption
+            else
+            {   
+                string errorMessage = string.Format("Click action failed for element at XPath: {0}", elementXPath);
+                RetryException error = new RetryException(errorMessage);
+                throw error;
+
+            }
         }
 
         /// <summary>
@@ -122,7 +141,7 @@ namespace SeleniumAutomationWebapp
         {
             IWebElement element;
 
-            int retryCount = 0;
+            int retryCount = 1;
             while (retryCount < maxRetryCount)
             {
                 try
@@ -157,7 +176,7 @@ namespace SeleniumAutomationWebapp
         {
             IWebElement element;
 
-            int retryCount = 0;
+            int retryCount = 1;
             while (retryCount < maxRetryCount)
             {
                 try
@@ -223,7 +242,6 @@ namespace SeleniumAutomationWebapp
         public static string CreateSuccessJson(string testName, bool success, Exception error)
         {
             // Create an object to dump - dynamic means it can be manipulated as I wish (like python)
-
             dynamic successObject = new
             {
                 testName = testName,
@@ -244,9 +262,104 @@ namespace SeleniumAutomationWebapp
         public static void WriteToSuccessLog(string testName, bool success, Exception error)
         {
             string jsonSuccessString = CreateSuccessJson(testName, success, error);
-            using (StreamWriter streamWriter = File.AppendText(GlobalSettings.successLogFilePath))
+            using (StreamWriter streamWriter = File.AppendText(successLogFilePath))
             {
                 streamWriter.WriteLine(jsonSuccessString);
+            }
+        }
+
+        /// <summary>
+        /// Creates and returns a success json string for a test
+        /// </summary>
+        /// <param name="testName"></param>
+        /// <param name="action"></param>
+        /// <param name="tryCounter"></param>
+        /// <returns></returns>
+        public static string CreatePerformanceJson(string testName, string action, int tryCount)
+        {
+            // Create an object to dump - dynamic means it can be manipulated as I wish (like python)
+            dynamic performanceObject = new
+            {
+                testName = testName,
+                action = action,
+                tryCount = tryCount
+            };
+
+            var json = JsonConvert.SerializeObject(performanceObject);
+            return json;
+        }
+
+        /// <summary>
+        /// Writes a new actions performance string to the performance log file
+        /// </summary>
+        /// <param name="testName"></param>
+        /// <param name="action"></param>
+        /// <param name="tryCount"></param>
+        public static void WriteToPerformanceLog(string testName, string action, int tryCount)
+        {
+            string jsonPerformanceString = CreatePerformanceJson(testName, action, tryCount);
+
+            using (StreamWriter streamWriter = File.AppendText(performanceLogFilePath))
+            {
+                streamWriter.WriteLine(jsonPerformanceString);
+            }
+        }
+
+        /// <summary>
+        /// Creates and return a line for a bad performance action
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="testName"></param>
+        /// <param name="actionIndexInTest"></param>
+        /// <param name="tryCount"></param>
+        /// <returns></returns>
+        public static string CreateFinalizedPerformanceJson(string action, string testName, int actionIndexInTest, int tryCount)
+        {
+            // Create an object to dump - dynamic means it can be manipulated as I wish (like python)
+            dynamic finalizedPerformanceObject = new
+            {
+                action = action,
+                testName = testName,
+                actionIndexInTest = actionIndexInTest,
+                tryCount = tryCount
+            };
+
+            var json = JsonConvert.SerializeObject(finalizedPerformanceObject);
+            return json;
+        }
+
+        /// <summary>
+        /// Analyzes the performance log and writes the laggy actions to the finalized performance log
+        /// </summary>
+        public static void WriteToFinalizedPerformanceLog()
+        {
+            string[] logLines = File.ReadAllLines(performanceLogFilePath);
+
+            string previousTest = "";
+            int actionIndexInTest = 1;
+
+            foreach (string line in logLines)
+            {
+                dynamic lineObject = JsonConvert.DeserializeObject(line);
+                string currentTest = lineObject.testName.ToString();
+
+                // Count index of operation in function (set to 1 if changed function)
+                actionIndexInTest = (currentTest.Equals(previousTest)) ? actionIndexInTest + 1 : 1;
+
+                var tryCount = Int32.Parse(lineObject.tryCount.ToString());
+
+                // Check if function exceeded try limit
+                if (tryCount > actionPerformanceLimit)
+                {
+                    var action = lineObject.action.ToString();
+                    string finalizedString = CreateFinalizedPerformanceJson(action, currentTest, actionIndexInTest, tryCount);
+
+                    using (StreamWriter streamWriter = File.AppendText(finalizedPerformanceLogFilePath))
+                    {
+                        streamWriter.WriteLine(finalizedString);
+                    }
+                }
+                previousTest = currentTest;
             }
         }
     }

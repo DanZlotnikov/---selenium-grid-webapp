@@ -29,6 +29,7 @@ namespace SeleniumAutomationWebapp
         {
             webappDriver.Quit();
             backofficeDriver.Quit();
+            WriteToFinalizedPerformanceLog();
         }
 
         /// <summary>
@@ -56,9 +57,6 @@ namespace SeleniumAutomationWebapp
         static void Main(string[] args)
         {
             RunTests();
-        }
-
-
-        
+        }   
     }
 }
