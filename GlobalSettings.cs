@@ -1,18 +1,21 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Remote;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SeleniumAutomationWebapp;
+﻿using System;
+using static SeleniumAutomationWebapp.HelperFunctions;
 
 namespace SeleniumAutomationWebapp
 {
     class GlobalSettings
     {
+        public static string successLogFilePath;
+        public static string performanceLogFilePath;
+        public static string finalizedPerformanceLogFilePath;
 
+        public static void InitLogFiles()
+        {
+            DateTime dateTime = DateTime.Now;
+
+            successLogFilePath = CreateNewLog("success", "chrome", dateTime);
+            performanceLogFilePath = CreateNewLog("performance", "chrome", dateTime);
+            finalizedPerformanceLogFilePath = CreateNewLog("finalizedPerformance", "chrome", dateTime);
+        }
     }  
 }

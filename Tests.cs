@@ -1,23 +1,13 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Remote;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Firefox;
+﻿using OpenQA.Selenium.Remote;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SeleniumAutomationWebapp;
-
+using static SeleniumAutomationWebapp.HelperFunctions;
+using static SeleniumAutomationWebapp.Consts;
 
 namespace SeleniumAutomationWebapp
 {
     class Tests
     {
-        public static void WebappSandboxSalesOrder(RemoteWebDriver webappDriver, RemoteWebDriver backofficeDriver)
-        {
-            HelperFunctions.GetToOrderCenter(webappDriver);
-        }
 
         public static void WebappSandboxLogin(RemoteWebDriver webappDriver, Dictionary<String, String> userCredentials)
         {
@@ -25,29 +15,38 @@ namespace SeleniumAutomationWebapp
             String password = userCredentials["password"];
 
             Exception error = null;
-            bool TestSuccess = true;
+            bool testSuccess = true;
 
             try
             {
-                webappDriver.Navigate().GoToUrl(Consts.webappSandboxLoginPageUrl);
+                // Login page
+                webappDriver.Navigate().GoToUrl(webappSandboxLoginPageUrl);
                 webappDriver.Manage().Window.Maximize();
-                webappDriver.FindElementByXPath("//input[@type='email']").SendKeys(username);
-                webappDriver.FindElementByXPath("//input[@type='password']").SendKeys(password);
-                HelperFunctions.SafeClick(webappDriver, "//button[@type='submit']");
-                System.Threading.Thread.Sleep(4000);
 
+                // Input credentials
+                SafeSendKeys(webappDriver, "//input[@type='email']", username);
+                SafeSendKeys(webappDriver, "//input[@type='password']", password);
 
+                // Login button
+                SafeClick(webappDriver, "//button[@type='submit']");
             }
+
             catch (Exception e)
             {
                 error = e;
-                TestSuccess = false;
+                testSuccess = false;
             }
+
             finally
             {
-                Console.WriteLine(error);
+                WriteToSuccessLog("WebappSandboxLogin", testSuccess, error);
             }
 
         }
+        public static void WebappSandboxSalesOrder(RemoteWebDriver webappDriver, RemoteWebDriver backofficeDriver)
+        {
+            GetToOrderCenter(webappDriver);
+        }
+
     }
 }
