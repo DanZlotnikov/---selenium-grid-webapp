@@ -37,11 +37,8 @@ namespace SeleniumAutomationWebapp
         /// </summary>
         public static void TestSuite()
         {
-            WebappSandboxLogin(webappDriver, new Dictionary<string, string>
-            {
-                {"username", "automation@pepperitest.com"},
-                {"password", "123456"}
-            });
+            string username = "automation@pepperitest.com";
+            WebappSandboxLogin(webappDriver, username, GetUserPassword(username));
 
             Delegator delegatedFunction = WebappSandboxSalesOrder;
             BasicTestWrapper(delegatedFunction, webappDriver, backofficeDriver);

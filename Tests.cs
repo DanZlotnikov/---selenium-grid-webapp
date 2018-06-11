@@ -9,11 +9,8 @@ namespace SeleniumAutomationWebapp
     class Tests
     {
 
-        public static void WebappSandboxLogin(RemoteWebDriver webappDriver, Dictionary<String, String> userCredentials)
+        public static void WebappSandboxLogin(RemoteWebDriver webappDriver, string username, string password)
         {
-            String username = userCredentials["username"];
-            String password = userCredentials["password"];
-
             Exception error = null;
             bool testSuccess = true;
 

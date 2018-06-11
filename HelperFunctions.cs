@@ -3,6 +3,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 using System;
 using System.IO;
+using System.Net;
 using System.Threading;
 using static SeleniumAutomationWebapp.Consts;
 using static SeleniumAutomationWebapp.GlobalSettings;
@@ -361,6 +362,60 @@ namespace SeleniumAutomationWebapp
                 }
                 previousTest = currentTest;
             }
+        }
+
+        /// <summary>
+        /// Gets API data from the server. Returns an array of objects representing the query data fetched (every object is a db row).
+        /// </summary>
+        /// <param name="AuthorizationPassword"> API authorization </param>
+        /// <param name="AuthorizationUsername"> API authorization </param>
+        /// <param name="objectType"> Requested object type (transaction, user, item, etc.) </param>
+        /// <param name="property"> Object attribute to be evaluated in request (id, name, email) </param>
+        /// <param name="value"> Expected value of requested attribute </param>
+        /// 
+        /// <returns></returns>
+        public static dynamic GetApiData(string AuthorizationUsername, string AuthorizationPassword, string objectType, string property, string value)
+        {
+            var data = string.Empty;
+
+            // API request url, with inserted data from method params
+            string url = string.Format(@"https://apint.pepperi.com/restapi/PepperiAPInt.Data.svc/V1.0/{0}?where={1}='{2}'", objectType, property, value);
+            
+            // Create the request object
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            
+            // Create encoding (authorization) string
+            String encoded = System.Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(AuthorizationUsername + ":" + AuthorizationPassword));
+
+            // Add authorization to request header
+            request.Headers.Add("Authorization", encoded);
+
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            // Data stream from request        
+            using (Stream stream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                data = reader.ReadToEnd();
+            }
+
+            // Convert json API data to c# object
+            dynamic DataObject = JsonConvert.DeserializeObject(data);           
+
+            return DataObject;
+        }
+
+
+        public static string GetUserPassword(string username)
+        {
+            string[] users = File.ReadAllLines(UserCredentialsFilePath);
+            foreach (string user in users)
+            {
+                dynamic userObject = JsonConvert.DeserializeObject(user);
+                if (userObject.username == username)
+                    return userObject.password;
+            }
+
+            return null;
         }
     }
 }
